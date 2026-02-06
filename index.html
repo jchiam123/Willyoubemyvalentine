@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Be My Valentine 💘</title>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #fff0f6, #ffe3ec);
+      overflow: hidden;
+    }
+
+    .card {
+      width: min(900px, 92vw);
+      background: white;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.15);
+      text-align: center;
+      position: relative;
+    }
+
+    h1 {
+      font-size: clamp(26px, 4vw, 42px);
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-top: 0;
+      opacity: .8;
+    }
+
+    .imgWrap {
+      margin: 18px auto;
+      border-radius: 18px;
+      overflow: hidden;
+      max-height: 420px;
+    }
+
+    .imgWrap img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+
+    .actions {
+      position: relative;
+      height: 80px;
+      margin-top: 20px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .12s ease;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    #yesBtn {
+      background: linear-gradient(135deg, #ff4d8d, #ff85b3);
+      color: white;
+      margin-right: 10px;
+      box-shadow: 0 12px 26px rgba(255,77,141,.35);
+    }
+
+    #noBtn {
+      background: linear-gradient(135deg, #111827, #374151);
+      color: white;
+      position: absolute;
+      left: 160px;
+      top: 0;
+      box-shadow: 0 10px 22px rgba(0,0,0,.25);
+      touch-action: none;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display: none;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .modal.open {
+      display: grid;
+    }
+
+    .modalCard {
+      background: white;
+      border-radius: 24px;
+      padding: 22px;
+      width: min(520px, 92vw);
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+
+    .modalCard img {
+      width: 100%;
+      border-radius: 18px;
+      margin-bottom: 14px;
+    }
+
+    .closeBtn {
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      color: white;
+      margin-top: 10px;
+      box-shadow: 0 12px 26px rgba(124,58,237,.25);
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card" id="card">
+    <h1>Hi P Daddy, will you be my Valentine? 💘</h1>
+    <p>I promise cute dates, laughs, and adventures together.</p>
+
+    <!-- Main question image -->
+    <div class="imgWrap">
+      <img src="sexy.jpg" alt="Will you be my Valentine">
+    </div>
+
+    <div class="actions" id="arena">
+      <button id="yesBtn">Yes 💞</button>
+      <button id="noBtn">No 🙅‍♂️</button>
+    </div>
+
+    <p style="font-size:13px; opacity:.6; margin-top:10px;">
+      Try clicking “No” 😏
+    </p>
+  </main>
+
+  <!-- YES MODAL -->
+  <section class="modal" id="modal">
+    <div class="modalCard">
+      <img src="yes.jpeg" alt="Valentine Yes">
+      <h2>YAYYY 💕</h2>
+      <p>Yay, you’re my hot date 😘🔥</p>
+      <button class="closeBtn" id="closeBtn">Come here 😏</button>
+    </div>
+  </section>
+
+  <script>
+    const arena = document.getElementById("arena");
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const modal = document.getElementById("modal");
+    const closeBtn = document.getElementById("closeBtn");
+
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function moveNoButton(x, y) {
+      const a = arena.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+
+      const bx = b.left + b.width / 2;
+      const by = b.top + b.height / 2;
+
+      let dx = bx - x;
+      let dy = by - y;
+      const len = Math.hypot(dx, dy) || 1;
+      dx /= len;
+      dy /= len;
+
+      const jump = 120 + Math.random() * 120;
+
+      let left = (parseFloat(noBtn.style.left) || 0) + dx * jump;
+      let top  = (parseFloat(noBtn.style.top)  || 0) + dy * jump;
+
+      left = clamp(left, 0, a.width - b.width);
+      top  = clamp(top, 0, a.height - b.height);
+
+      noBtn.style.left = left + "px";
+      noBtn.style.top  = top + "px";
+    }
+
+    arena.addEventListener("mousemove", e => {
+      const b = noBtn.getBoundingClientRect();
+      const dist = Math.hypot(
+        (b.left + b.width/2) - e.clientX,
+        (b.top + b.height/2) - e.clientY
+      );
+      if (dist < 110) moveNoButton(e.clientX, e.clientY);
+    });
+
+    noBtn.addEventListener("touchstart", e => {
+      const t = e.touches[0];
+      moveNoButton(t.clientX, t.clientY);
+    });
+
+    noBtn.addEventListener("click", e => {
+      moveNoButton(e.clientX, e.clientY);
+      noBtn.textContent = "Nice try 😜";
+      setTimeout(() => noBtn.textContent = "No 🙅‍♂️", 800);
+    });
+
+    yesBtn.addEventListener("click", () => {
+      modal.classList.add("open");
+    });
+
+    closeBtn.addEventListener("click", () => {
+      modal.classList.remove("open");
+    });
+
+    modal.addEventListener("click", e => {
+      if (e.target === modal) modal.classList.remove("open");
+    });
+  </script>
+</body>
+</html>
