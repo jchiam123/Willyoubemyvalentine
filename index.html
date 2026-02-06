@@ -94,6 +94,7 @@
       display: none;
       place-items: center;
       padding: 20px;
+      z-index: 50;
     }
 
     .modal.open {
@@ -121,15 +122,27 @@
       margin-top: 10px;
       box-shadow: 0 12px 26px rgba(124,58,237,.25);
     }
+
+    /* 💖 Heart confetti */
+    .heart {
+      position: fixed;
+      pointer-events: none;
+      animation: floatUp 2.4s ease-out forwards;
+      z-index: 9999;
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(0) scale(1); opacity: .95; }
+      to   { transform: translateY(-160px) scale(1.25); opacity: 0; }
+    }
   </style>
 </head>
 
 <body>
   <main class="card" id="card">
     <h1>Hi P Daddy, will you be my Valentine? 💘</h1>
-    <p>I promise cute dates, laughs, and adventures together.</p>
+    
 
-    <!-- Main question image -->
     <div class="imgWrap">
       <img src="sexy.jpg" alt="Will you be my Valentine">
     </div>
@@ -148,8 +161,8 @@
   <section class="modal" id="modal">
     <div class="modalCard">
       <img src="yes.jpeg" alt="Valentine Yes">
-      <h2>YAYYY 💕</h2>
-      <p>Yay, you’re my hot date 😘🔥</p>
+      <h2>YAY BABY 💕</h2>
+      <p>Can't wait for adventures w you 😘🔥</p>
       <button class="closeBtn" id="closeBtn">Come here 😏</button>
     </div>
   </section>
@@ -161,14 +174,47 @@
     const modal = document.getElementById("modal");
     const closeBtn = document.getElementById("closeBtn");
 
+    /* 💖 Hearts */
+    function spawnHeart(x, y) {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.textContent = ["💘","💖","💗","💕","💞","😍"][Math.floor(Math.random()*6)];
+      heart.style.fontSize = (16 + Math.random()*18) + "px";
+      heart.style.left = x + "px";
+      heart.style.top = y + "px";
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 2400);
+    }
+
+    function burstHearts(el, count = 30) {
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      for (let i = 0; i < count; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const d = 10 + Math.random() * 70;
+        spawnHeart(cx + Math.cos(a)*d, cy + Math.sin(a)*d);
+      }
+    }
+
+    /* 😈 No button chaos */
+    let noAttempts = 0;
+    const taunts = [
+      "No 🙅‍♂️",
+      "Nice try 😏",
+      "LOL nope 😈",
+      "Not happening 💅",
+      "You’re stuck with me 💘",
+      "Absolutely not 🏃‍♂️💨"
+    ];
+
     function clamp(n, min, max) {
       return Math.max(min, Math.min(max, n));
     }
 
-    function moveNoButton(x, y) {
+    function runAway(x, y) {
       const a = arena.getBoundingClientRect();
       const b = noBtn.getBoundingClientRect();
-
       const bx = b.left + b.width / 2;
       const by = b.top + b.height / 2;
 
@@ -178,48 +224,51 @@
       dx /= len;
       dy /= len;
 
-      const jump = 120 + Math.random() * 120;
+      const jump = 120 + Math.random()*120 + Math.min(noAttempts*25, 160);
 
-      let left = (parseFloat(noBtn.style.left) || 0) + dx * jump;
-      let top  = (parseFloat(noBtn.style.top)  || 0) + dy * jump;
+      let left = (parseFloat(noBtn.style.left) || 0) + dx*jump;
+      let top  = (parseFloat(noBtn.style.top) || 0) + dy*jump;
 
-      left = clamp(left, 0, a.width - b.width);
-      top  = clamp(top, 0, a.height - b.height);
+      noBtn.style.left = clamp(left, 0, a.width - b.width) + "px";
+      noBtn.style.top  = clamp(top, 0, a.height - b.height) + "px";
+    }
 
-      noBtn.style.left = left + "px";
-      noBtn.style.top  = top + "px";
+    function handleNo(x, y) {
+      noAttempts++;
+      noBtn.textContent = taunts[Math.min(noAttempts, taunts.length - 1)];
+      noBtn.style.transform = `scale(${Math.max(1 - noAttempts*0.06, 0.6)})`;
+      runAway(x, y);
+      spawnHeart(x, y);
+      setTimeout(() => noBtn.textContent = "No 🙅‍♂️", 900);
     }
 
     arena.addEventListener("mousemove", e => {
       const b = noBtn.getBoundingClientRect();
-      const dist = Math.hypot(
-        (b.left + b.width/2) - e.clientX,
-        (b.top + b.height/2) - e.clientY
-      );
-      if (dist < 110) moveNoButton(e.clientX, e.clientY);
+      const dist = Math.hypot((b.left+b.width/2)-e.clientX, (b.top+b.height/2)-e.clientY);
+      if (dist < 120 + noAttempts*8) handleNo(e.clientX, e.clientY);
     });
 
+    noBtn.addEventListener("click", e => handleNo(e.clientX, e.clientY));
     noBtn.addEventListener("touchstart", e => {
       const t = e.touches[0];
-      moveNoButton(t.clientX, t.clientY);
-    });
-
-    noBtn.addEventListener("click", e => {
-      moveNoButton(e.clientX, e.clientY);
-      noBtn.textContent = "Nice try 😜";
-      setTimeout(() => noBtn.textContent = "No 🙅‍♂️", 800);
-    });
+      handleNo(t.clientX, t.clientY);
+    }, { passive:true });
 
     yesBtn.addEventListener("click", () => {
-      modal.classList.add("open");
+      burstHearts(yesBtn, 32);
+      setTimeout(() => modal.classList.add("open"), 250);
     });
 
-    closeBtn.addEventListener("click", () => {
-      modal.classList.remove("open");
-    });
-
+    closeBtn.addEventListener("click", () => modal.classList.remove("open"));
     modal.addEventListener("click", e => {
       if (e.target === modal) modal.classList.remove("open");
+    });
+
+    window.addEventListener("load", () => {
+      const a = arena.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+      noBtn.style.left = Math.min(160, Math.max(0, a.width - b.width)) + "px";
+      noBtn.style.top = "0px";
     });
   </script>
 </body>
