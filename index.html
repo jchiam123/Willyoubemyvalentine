@@ -238,7 +238,6 @@
       noBtn.textContent = taunts[Math.min(noAttempts, taunts.length - 1)];
       noBtn.style.transform = `scale(${Math.max(1 - noAttempts*0.06, 0.6)})`;
       runAway(x, y);
-      spawnHeart(x, y);
       setTimeout(() => noBtn.textContent = "No 🙅‍♂️", 900);
     }
 
@@ -273,3 +272,4 @@
   </script>
 </body>
 </html>
+
