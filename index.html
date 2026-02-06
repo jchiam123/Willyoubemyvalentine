@@ -36,17 +36,21 @@
       opacity: .8;
     }
 
-    .imgWrap {
+    . {
       margin: 18px auto;
       border-radius: 18px;
       overflow: hidden;
-      max-height: 420px;
+      max-width: 100%;
+  background: #000;
     }
 
     .imgWrap img {
-      width: 100%;
-      height: auto;
-      object-fit: cover;
+ width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain; 
+  display: block;
+  margin: 0 auto;
     }
 
     .actions {
@@ -143,7 +147,7 @@
     <h1>Hi P Daddy, will you be my Valentine? 💘</h1>
     
 
-    <div class="imgWrap">
+    <div class="">
       <img src="sexy.jpg" alt="Will you be my Valentine">
     </div>
 
@@ -272,4 +276,5 @@
   </script>
 </body>
 </html>
+
 
